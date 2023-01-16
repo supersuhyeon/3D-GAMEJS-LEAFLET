@@ -1,0 +1,107 @@
+(function() {
+    function getFormData(form) {
+      var elements = form.elements;
+      var honeypot;
+  
+      var fields = Object.keys(elements).filter(function(k) {
+        if (elements[k].name === "honeypot") {
+          honeypot = elements[k].value;
+          return false;
+        }
+        return true;
+      }).map(function(k) {
+        if(elements[k].name !== undefined) {
+          return elements[k].name;
+        }else if(elements[k].length > 0){
+          return elements[k].item(0).name;
+        }
+      }).filter(function(item, pos, self) {
+        return self.indexOf(item) == pos && item;
+      });
+  
+      var formData = {};
+      fields.forEach(function(name){
+        var element = elements[name];
+        
+        formData[name] = element.value;
+      });
+  
+      formData.formDataNameOrder = JSON.stringify(fields);
+      formData.formGoogleSheetName = form.dataset.sheet || "responses"; 
+      formData.formGoogleSendEmail
+        = form.dataset.email || ""; 
+  
+      return {data: formData, honeypot: honeypot};
+    }
+  
+    function handleFormSubmit(event) {  
+      event.preventDefault();           
+      var form = event.target;
+      var formData = getFormData(form);
+      var data = formData.data;
+  
+      if (formData.honeypot) {
+        return false;
+      }
+
+      const email = document.querySelector('#email')
+      console.log(email.value.length)
+      if (email.value.length >= 1) {
+        let exptext = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+        if (exptext.test(email.value) == false) {	
+            alert("Please enter a vaild email");
+            email.focus();
+            document.querySelector(".gform").action = " ";
+        }else if(email.value.length === 0){
+            return
+        }else{
+            document.querySelector(".gform").action = "https://script.google.com/macros/s/AKfycbwGNiUTv98-qxYw8ZoypvZHrfM57p8IG5j7otanN2MhuWgLRWbhNtO0dYJZZru5QuwM1Q/exec";
+            document.querySelector('.send-btn').classList.add('disabled')
+            var url = form.action;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url);
+            // xhr.withCredentials = true;
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                  form.reset();
+                  var formElements = form.querySelector(".form-elements")
+                  if (formElements) {
+                    formElements.style.display = "none"; // hide form
+                  }
+                  var thankYouMessage = form.querySelector(".thankyou_message");
+                  if (thankYouMessage) {
+                    thankYouMessage.style.display = "block";
+                  }
+                }
+            };
+            var encoded = Object.keys(data).map(function(k) {
+                return encodeURIComponent(k) + "=" + encodeURIComponent(data[k]);
+            }).join('&');
+            xhr.send(encoded);
+          }
+        }
+    }
+      
+    
+    function loaded() {
+      // bind to the submit event of our form
+      var forms = document.querySelectorAll("form.gform");
+      for (var i = 0; i < forms.length; i++) {
+        forms[i].addEventListener("submit", handleFormSubmit, false);
+      }
+    };
+    document.addEventListener("DOMContentLoaded", loaded, false);
+    
+  })();
+
+function play(){
+    const audio = document.querySelector('#audio1')
+    audio.play()
+}
+
+document.querySelector('.bgsound-stop').addEventListener('click', ()=>{
+    const audio = document.querySelector('#audio1')
+    audio.pause()
+    audio.load()
+})
