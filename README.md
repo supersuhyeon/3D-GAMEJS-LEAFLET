@@ -2,7 +2,7 @@
 This is a 3D interactive leaflet that I made for a section named JS game on my portfolio website.<br>
 I was inspired by Squid Game, so the overall design is dark, with the famous circle, triangle, and square business card as a leaflet.<br>
 [Suhyeon Kim portfolio website](https://suhyeonkim-portfolio.netlify.app/)<br>
-[3D-LEAFLET](https://earnest-manatee-f5bd67.netlify.app/)
+[3D-LEAFLET](https://magenta-brioche-9db893.netlify.app/)
 
 ### Languages
 
